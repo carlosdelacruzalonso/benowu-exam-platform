@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benowu - Plataforma de Exámenes</title>
+    <style>
+        :root {
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --accent-dark: #4f46e5;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --success: #22c55e;
+            --success-glow: rgba(34, 197, 94, 0.3);
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.3);
+            --warning: #eab308;
+            --warning-glow: rgba(234, 179, 8, 0.3);
+            --blue: #3b82f6;
+            --gold: #f59e0b;
+            --silver: #94a3b8;
+            --bronze: #d97706;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-0: #09090b;
+            --bg-1: #18181b;
+            --bg-2: #27272a;
+            --bg-3: #3f3f46;
+            --bg-4: #52525b;
+            --text-0: #ffffff;
+            --text-1: #f4f4f5;
+            --text-2: #d4d4d8;
+            --text-3: #a1a1aa;
+            --border: #3f3f46;
+            --border-light: #52525b;
+        }
+
+        [data-theme="light"] {
+            --bg-0: #ffffff;
+            --bg-1: #fafafa;
+            --bg-2: #f4f4f5;
+            --bg-3: #e4e4e7;
+            --bg-4: #d4d4d8;
+            --text-0: #09090b;
+            --text-1: #18181b;
+            --text-2: #3f3f46;
+            --text-3: #71717a;
+            --border: #e4e4e7;
+            --border-light: #d4d4d8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font);
+            font-size: 15px;
+            line-height: 1.6;
+            background: var(--bg-0);
+            color: var(--text-0);
+            -webkit-font-smoothing: antialiased;
+        }
+        #app { min-height: 100vh; background: var(--bg-0); }
+
+        /* HEADER */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-1);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .logo:hover { opacity: 0.8; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .theme-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-2);
+            color: var(--text-2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        .theme-btn:hover { background: var(--bg-3); color: var(--text-0); }
+        .user-section { display: flex; align-items: center; gap: 12px; }
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 12px 4px 4px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .user-pill:hover { background: var(--bg-3); }
+        .user-pill .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            overflow: hidden;
+        }
+        .user-pill .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-pill .name { font-size: 14px; font-weight: 500; color: var(--text-0); }
+        .admin-badge {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .logout-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-1);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .logout-btn:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); border-color: var(--danger); }
+
+        /* LAYOUT */
+        .container { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+        .container.wide { max-width: 1100px; }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: white;
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+        .btn-secondary { background: var(--bg-2); color: var(--text-1); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--bg-3); }
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%); color: white; }
+        .btn-gold { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .btn-danger { background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%); color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .btn-sm { padding: 8px 14px; font-size: 13px; }
+        .btn-xs { padding: 6px 10px; font-size: 12px; }
+
+        /* FORMS */
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--text-0);
+            transition: var(--transition);
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-3); }
+        .form-group .error-msg { color: var(--danger); font-size: 12px; margin-top: 6px; display: none; }
+        .form-group.error input { border-color: var(--danger); }
+        .form-group.error .error-msg { display: block; }
+        .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+        /* LOGIN */
+        .login-wrapper {
+            min-height: calc(100vh - 56px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 380px;
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px 32px;
+            text-align: center;
+        }
+        .login-header { margin-bottom: 32px; }
+        .login-header .brand {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .login-header .tagline { font-size: 14px; color: var(--text-2); }
+        .login-footer { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-3); }
+
+        /* ALERT */
+        .alert-banner {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .alert-banner .icon { font-size: 20px; }
+        .alert-banner .text { flex: 1; }
+        .alert-banner .deadline { font-weight: 700; }
+
+        /* DASHBOARD */
+        .page-title { font-size: 28px; font-weight: 700; color: var(--text-0); margin-bottom: 4px; }
+        .page-subtitle { font-size: 15px; color: var(--text-2); margin-bottom: 32px; }
+        .tabs {
+            display: flex;
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 4px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-2);
+            cursor: pointer;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+        .tab:hover:not(.active) { color: var(--text-1); }
+        .tab.active { background: var(--accent); color: white; box-shadow: 0 2px 8px var(--accent-glow); }
+
+        /* EXAM GRID */
+        .exam-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        .exam-card {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        .exam-card:hover:not(.locked) { border-color: var(--accent); box-shadow: 0 4px 20px var(--accent-glow); transform: translateY(-2px); }
+        .exam-card.locked { opacity: 0.7; cursor: default; }
+        .exam-card.locked::before {
+            content: '🔒';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 16px;
+        }
+        .exam-card-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+        .exam-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .exam-card-head h3 { font-size: 16px; font-weight: 600; color: var(--text-0); margin-bottom: 4px; }
+        .exam-card-head p { font-size: 13px; color: var(--text-2); }
+        .exam-card-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-3); margin-top: 12px; }
+        .exam-card-meta span { display: flex; align-items: center; gap: 4px; }
+        .exam-status { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; font-weight: 600; }
+        .exam-status.passed { color: var(--success); }
+        .exam-status.failed { color: var(--danger); }
+        .exam-status.pending { color: var(--warning); }
+        .attempts-badge {
+            display: inline-block;
+            background: var(--bg-3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-2);
+            margin-left: 8px;
+        }
+
+        /* HISTORY */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-3); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; }
+        .history-item {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .history-item:hover { border-color: var(--border-light); background: var(--bg-2); }
+        .history-score {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .history-score.excellent { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+        .history-score.good { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .history-score.regular { background: rgba(234, 179, 8, 0.15); color: var(--warning); }
+        .history-score.poor { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .history-info { flex: 1; }
+        .history-info h4 { font-size: 15px; font-weight: 600; color: var(--text-0); margin-bottom: 2px; }
+        .history-info p { font-size: 13px; color: var(--text-2); }
+        .history-actions { display: flex; gap: 8px; }
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-2);
+            color: var(--text-1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        .icon-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+        .icon-btn.danger:hover { background: var(--danger); border-color: var(--danger); }
+
+        /* RANKING */
+        .ranking-list { display: flex; flex-direction: column; gap: 8px; }
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+        }
+        .ranking-item.top-1 { border-color: var(--gold); background: rgba(245, 158, 11, 0.1); }
+        .ranking-item.top-2 { border-color: var(--silver); background: rgba(148, 163, 184, 0.1); }
+        .ranking-item.top-3 { border-color: var(--bronze); background: rgba(217, 119, 6, 0.1); }
+        .ranking-pos {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            background: var(--bg-2);
+            color: var(--text-1);
+        }
+        .ranking-item.top-1 .ranking-pos { background: var(--gold); color: #000; }
+        .ranking-item.top-2 .ranking-pos { background: var(--silver); color: #000; }
+        .ranking-item.top-3 .ranking-pos { background: var(--bronze); color: #fff; }
+        .ranking-info { flex: 1; }
+        .ranking-info h4 { font-size: 15px; font-weight: 600; color: var(--text-0); }
+        .ranking-info p { font-size: 13px; color: var(--text-2); }
+        .ranking-score { font-size: 20px; font-weight: 700; color: var(--accent); }
+        .ranking-medal { font-size: 24px; }
+
+        /* ADMIN */
+        .admin-tabs { margin-bottom: 24px; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+        .stat-box {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: center;
+        }
+        .stat-box .value {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-box .label { font-size: 13px; color: var(--text-1); margin-top: 4px; font-weight: 500; }
+        .chart-container {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .chart-title { font-size: 18px; font-weight: 700; margin-bottom: 24px; color: var(--text-0); display: flex; align-items: center; gap: 10px; }
+        .bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 200px; padding-top: 30px; }
+        .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .bar {
+            width: 100%;
+            max-width: 60px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+            border-radius: 8px 8px 0 0;
+            transition: height 0.5s ease;
+            position: relative;
+            min-height: 4px;
+        }
+        .bar::before {
+            content: attr(data-value);
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-0);
+        }
+        .bar-label { font-size: 13px; color: var(--text-0); text-align: center; font-weight: 600; background: var(--bg-2); padding: 4px 8px; border-radius: 4px; }
+        .data-table {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 100px 100px;
+            padding: 14px 20px;
+            background: var(--bg-2);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-0);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 100px 100px;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .table-row:first-child { border-top: none; }
+        .table-row:hover { background: var(--bg-2); }
+        .table-row .name { font-weight: 600; color: var(--text-0); font-size: 15px; }
+        .table-row .dni { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+        .table-row .exam { font-size: 14px; color: var(--text-1); }
+        .table-row .score { font-weight: 700; font-size: 16px; }
+        .table-row .score.excellent { color: var(--success); }
+        .table-row .score.good { color: var(--blue); }
+        .table-row .score.regular { color: var(--warning); }
+        .table-row .score.poor { color: var(--danger); }
+        .table-row .aciertos { font-size: 14px; color: var(--text-0); font-weight: 600; }
+
+        /* EXAM MANAGER */
+        .exam-manager-grid { display: grid; gap: 16px; }
+        .exam-manager-item {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .exam-manager-item:hover { border-color: var(--border-light); }
+        .exam-manager-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-2);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px dashed var(--border);
+        }
+        .exam-manager-icon:hover { border-color: var(--accent); background: var(--bg-3); }
+        .exam-manager-info { flex: 1; }
+        .exam-manager-info h4 { font-size: 16px; font-weight: 600; color: var(--text-0); margin-bottom: 4px; }
+        .exam-manager-info p { font-size: 13px; color: var(--text-2); }
+        .exam-manager-actions { display: flex; gap: 8px; }
+
+        /* EXAM SCREEN */
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+        .exam-title h2 { font-size: 20px; font-weight: 600; color: var(--text-0); }
+        .exam-title p { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+        .timer {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: 20px;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-0);
+        }
+        .timer.warning { background: rgba(234, 179, 8, 0.15); border-color: var(--warning); color: var(--warning); }
+        .timer.danger { background: rgba(239, 68, 68, 0.15); border-color: var(--danger); color: var(--danger); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        .progress-section { margin-bottom: 32px; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-2); margin-bottom: 10px; }
+        .progress-track { height: 6px; background: var(--bg-2); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 3px; transition: width 0.3s ease; }
+        .question-section { margin-bottom: 32px; }
+        .question-label {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+        .question-text { font-size: 22px; font-weight: 600; color: var(--text-0); line-height: 1.4; margin-bottom: 28px; }
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--bg-1);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .option:hover { border-color: var(--border-light); background: var(--bg-2); }
+        .option.selected { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); }
+        .option .letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-1);
+            margin-right: 14px;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .option.selected .letter { background: var(--accent); border-color: var(--accent); color: white; }
+        .option .text { font-size: 15px; font-weight: 500; color: var(--text-0); }
+        .option.correct { border-color: var(--success); background: rgba(34, 197, 94, 0.1); }
+        .option.correct .letter { background: var(--success); border-color: var(--success); color: white; }
+        .option.incorrect { border-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .option.incorrect .letter { background: var(--danger); border-color: var(--danger); color: white; }
+        .nav-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            margin-top: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .mark-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-2);
+            transition: var(--transition);
+            user-select: none;
+        }
+        .mark-toggle:hover { background: var(--bg-2); }
+        .mark-toggle.active { background: rgba(234, 179, 8, 0.15); color: var(--warning); }
+        .mark-toggle .check {
+            width: 18px;
+            height: 18px;
+            border: 2px solid currentColor;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+        .mark-toggle.active .check { background: var(--warning); border-color: var(--warning); color: #000; }
+        .nav-buttons { display: flex; gap: 12px; }
+        .question-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+        .q-num {
+            width: 38px;
+            height: 38px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-2);
+            color: var(--text-1);
+        }
+        .q-num:hover { border-color: var(--accent); }
+        .q-num.current { background: var(--accent); border-color: var(--accent); color: white; }
+        .q-num.answered { background: var(--success); border-color: var(--success); color: white; }
+        .q-num.marked { box-shadow: 0 0 0 2px var(--warning); }
+
+        /* RESULTS */
+        .results-card {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            text-align: center;
+        }
+        .results-header { margin-bottom: 32px; }
+        .results-header h2 { font-size: 24px; font-weight: 700; color: var(--text-0); margin-bottom: 8px; }
+        .results-header p { color: var(--text-2); }
+        .score-display { background: var(--bg-2); border-radius: var(--radius-xl); padding: 40px; margin-bottom: 32px; }
+        .score-number { font-size: 64px; font-weight: 800; line-height: 1; color: var(--text-0); }
+        .score-number span { font-size: 24px; color: var(--text-3); }
+        .score-label { font-size: 15px; color: var(--text-2); margin-top: 8px; }
+        .score-bar { height: 8px; background: var(--bg-3); border-radius: 4px; margin-top: 24px; overflow: hidden; }
+        .score-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .score-bar-fill.excellent { background: linear-gradient(90deg, var(--success), #4ade80); }
+        .score-bar-fill.good { background: linear-gradient(90deg, var(--blue), #60a5fa); }
+        .score-bar-fill.regular { background: linear-gradient(90deg, var(--warning), #facc15); }
+        .score-bar-fill.poor { background: linear-gradient(90deg, var(--danger), #f87171); }
+        .stats-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+        .stats-card { background: var(--bg-2); border-radius: var(--radius); padding: 20px; }
+        .stats-card .icon { font-size: 24px; margin-bottom: 8px; }
+        .stats-card .num { font-size: 28px; font-weight: 700; }
+        .stats-card.correct .num { color: var(--success); }
+        .stats-card.incorrect .num { color: var(--danger); }
+        .stats-card.skip .num { color: var(--text-3); }
+        .stats-card .lbl { font-size: 12px; color: var(--text-2); margin-top: 4px; }
+        .pass-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+        .pass-badge.passed { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+        .pass-badge.failed { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .review-section { text-align: left; margin-top: 40px; }
+        .review-section h3 { font-size: 18px; font-weight: 600; margin-bottom: 20px; text-align: center; }
+        .review-item { background: var(--bg-2); border-radius: var(--radius); padding: 20px; margin-bottom: 12px; border-left: 4px solid transparent; }
+        .review-item.correct { border-left-color: var(--success); }
+        .review-item.incorrect { border-left-color: var(--danger); }
+        .review-item.skip { border-left-color: var(--text-3); }
+        .review-item-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+        .review-item-num {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        .review-item.correct .review-item-num { background: var(--success); }
+        .review-item.incorrect .review-item-num { background: var(--danger); }
+        .review-item.skip .review-item-num { background: var(--text-3); }
+        .review-item-q { font-weight: 600; font-size: 14px; color: var(--text-0); line-height: 1.4; }
+        .review-answers { margin-left: 38px; }
+        .review-answers p { font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-top: 8px; }
+        .review-answers .user-ans { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .review-answers .user-ans.is-correct { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+        .review-answers .correct-ans { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+        .results-actions { display: flex; justify-content: center; gap: 16px; margin-top: 32px; flex-wrap: wrap; }
+        .review-locked {
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-2);
+            border-radius: var(--radius-lg);
+            color: var(--text-2);
+        }
+        .review-locked .icon { font-size: 48px; margin-bottom: 16px; }
+
+        /* CERTIFICATE */
+        .certificate-preview {
+            background: white;
+            color: #1a1a2e;
+            border-radius: 8px;
+            padding: 60px 50px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .certificate-preview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #06b6d4);
+        }
+        .certificate-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #06b6d4, #8b5cf6, #6366f1);
+        }
+        .cert-border {
+            border: 3px solid #6366f1;
+            border-radius: 4px;
+            padding: 40px;
+            position: relative;
+        }
+        .cert-corner {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #8b5cf6;
+        }
+        .cert-corner.tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .cert-corner.tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+        .cert-corner.bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+        .cert-corner.br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+        .cert-logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .cert-subtitle { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 30px; }
+        .cert-title { font-size: 36px; font-weight: 700; color: #1e293b; margin-bottom: 8px; font-family: Georgia, serif; }
+        .cert-text { font-size: 14px; color: #64748b; margin-bottom: 24px; }
+        .cert-name {
+            font-size: 32px;
+            font-weight: 700;
+            color: #6366f1;
+            margin: 20px 0;
+            font-family: Georgia, serif;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .cert-course { font-size: 20px; color: #334155; margin: 16px 0; font-weight: 600; }
+        .cert-score {
+            display: inline-block;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 100px;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 20px 0;
+        }
+        .cert-date { font-size: 13px; color: #94a3b8; margin-top: 24px; }
+        .cert-seal {
+            width: 80px;
+            height: 80px;
+            margin: 20px auto 0;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        }
+        .cert-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .cert-sig { text-align: center; }
+        .cert-sig-line { width: 150px; border-bottom: 1px solid #cbd5e1; margin-bottom: 8px; }
+        .cert-sig-name { font-size: 12px; color: #64748b; }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal.wide { max-width: 700px; }
+        .modal.xl { max-width: 900px; text-align: left; }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+        }
+        .modal h3 { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: var(--text-0); }
+        .modal p { color: var(--text-2); margin-bottom: 24px; font-size: 14px; line-height: 1.5; }
+        .modal-buttons { display: flex; gap: 12px; justify-content: center; }
+        .modal-buttons .btn { flex: 1; max-width: 200px; }
+        .profile-modal .modal { max-width: 340px; }
+        .profile-avatar-edit { width: 88px; height: 88px; margin: 0 auto 20px; position: relative; cursor: pointer; }
+        .profile-avatar-edit .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            overflow: hidden;
+        }
+        .profile-avatar-edit .avatar-img img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-avatar-edit .edit-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--bg-2);
+            border: 2px solid var(--bg-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .profile-avatar-edit input { display: none; }
+        .profile-info h4 { font-size: 18px; font-weight: 600; margin-bottom: 4px; color: var(--text-0); }
+        .profile-info p { font-size: 14px; color: var(--text-2); margin-bottom: 24px; }
+
+        /* EMOJI PICKER */
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 16px;
+            background: var(--bg-2);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+        }
+        .emoji-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .emoji-item:hover { background: var(--bg-3); transform: scale(1.1); }
+        .emoji-item.selected { background: var(--accent); }
+
+        /* CONFETTI */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall 3s linear forwards;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .form-row, .form-row-3 { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .container { padding: 24px 16px; }
+            .login-card { padding: 32px 24px; }
+            .results-card { padding: 24px; }
+            .exam-header { flex-direction: column; gap: 16px; text-align: center; }
+            .stats-row, .stats-cards { grid-template-columns: 1fr; }
+            .nav-section { flex-direction: column; }
+            .nav-buttons { width: 100%; }
+            .nav-buttons .btn { flex: 1; }
+            .table-header, .table-row { grid-template-columns: 1fr 80px; }
+            .table-header > *:nth-child(2), .table-header > *:nth-child(4),
+            .table-row > *:nth-child(2), .table-row > *:nth-child(4) { display: none; }
+            .user-pill .name { display: none; }
+            .score-number { font-size: 48px; }
+            .certificate-preview { padding: 30px 20px; }
+            .cert-border { padding: 20px; }
+            .cert-title { font-size: 24px; }
+            .cert-name { font-size: 22px; }
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .certificate-print, .certificate-print * { visibility: visible; }
+            .certificate-print { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" data-theme="dark">
+        <header class="header">
+            <div class="logo" id="logoBtn">Benowu</div>
+            <div class="header-right">
+                <button class="theme-btn" id="themeBtn" title="Cambiar tema">🌙</button>
+                <div class="user-section hidden" id="userMenu">
+                    <button class="user-pill" id="profileBtn">
+                        <div class="avatar" id="headerAvatar"></div>
+                        <span class="name" id="headerName"></span>
+                    </button>
+                    <span class="admin-badge hidden" id="adminBadge">Admin</span>
+                    <button class="logout-btn" id="logoutBtn">Salir</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="alert-banner hidden" id="alertBanner">
+            <span class="icon">⏰</span>
+            <span class="text">Tienes exámenes pendientes. Fecha límite: <span class="deadline" id="alertDeadline"></span></span>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="login-wrapper" id="loginScreen">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="brand">Benowu</div>
+                    <div class="tagline">Educación Online con Clases en directo</div>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group" id="nameGroup">
+                        <label>Nombre completo</label>
+                        <input type="text" id="nameInput" placeholder="Tu nombre" autocomplete="name">
+                        <span class="error-msg">Mínimo 3 caracteres</span>
+                    </div>
+                    <div class="form-group" id="dniGroup">
+                        <label>DNI / Código de acceso</label>
+                        <input type="text" id="dniInput" placeholder="12345678A" maxlength="20" autocomplete="off">
+                        <span class="error-msg">Formato: 8 números + 1 letra</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">Acceder</button>
+                </form>
+                <div class="login-footer">Benowu © 2026 · Plataforma de exámenes</div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="container hidden" id="dashboardScreen">
+            <h1 class="page-title">Exámenes</h1>
+            <p class="page-subtitle">Selecciona un examen o revisa tu historial</p>
+            <div class="tabs">
+                <button class="tab active" data-tab="exams">Disponibles</button>
+                <button class="tab" data-tab="history">Mi historial</button>
+            </div>
+            <div id="examsTab"><div class="exam-grid" id="examGrid"></div></div>
+            <div id="historyTab" class="hidden"><div id="historyContent"></div></div>
+        </div>
+
+        <!-- ADMIN -->
+        <div class="container wide hidden" id="adminScreen">
+            <h1 class="page-title">Panel de Administración</h1>
+            <p class="page-subtitle">Gestiona exámenes, resultados y estadísticas</p>
+            <div class="tabs admin-tabs">
+                <button class="tab active" data-admin-tab="stats">📊 Estadísticas</button>
+                <button class="tab" data-admin-tab="results">📋 Resultados</button>
+                <button class="tab" data-admin-tab="ranking">🏆 Ranking</button>
+                <button class="tab" data-admin-tab="exams">📝 Exámenes</button>
+            </div>
+
+            <div id="adminStatsTab">
+                <div class="stats-row">
+                    <div class="stat-box"><div class="value" id="statStudents">0</div><div class="label">Alumnos</div></div>
+                    <div class="stat-box"><div class="value" id="statExams">0</div><div class="label">Exámenes realizados</div></div>
+                    <div class="stat-box"><div class="value" id="statAvg">0</div><div class="label">Nota media</div></div>
+                    <div class="stat-box"><div class="value" id="statPass">0%</div><div class="label">% Aprobados</div></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title"><span>📊</span> Distribución de notas</div>
+                    <div class="bar-chart" id="gradeChart"></div>
+                </div>
+            </div>
+
+            <div id="adminResultsTab" class="hidden">
+                <div class="data-table" id="dataTable">
+                    <div class="table-header">
+                        <span>Alumno</span>
+                        <span>Examen</span>
+                        <span>Nota</span>
+                        <span>Aciertos</span>
+                    </div>
+                    <div id="tableBody"></div>
+                </div>
+            </div>
+
+            <div id="adminRankingTab" class="hidden">
+                <div id="adminRankingContent"></div>
+            </div>
+
+            <div id="adminExamsTab" class="hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h3 style="color: var(--text-0);">Gestión de Exámenes</h3>
+                    <button class="btn btn-primary" id="newExamBtn">+ Nuevo Examen</button>
+                </div>
+                <div class="exam-manager-grid" id="examManagerGrid"></div>
+            </div>
+        </div>
+
+        <!-- EXAM -->
+        <div class="container hidden" id="examScreen">
+            <div class="exam-header">
+                <div class="exam-title">
+                    <h2 id="examTitle">Examen</h2>
+                    <p>Responde antes de que termine el tiempo</p>
+                </div>
+                <div class="timer" id="timer">30:00</div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span id="qCounter">Pregunta 1 de 15</span>
+                    <span id="aCounter">0 respondidas</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+            </div>
+            <div class="question-section">
+                <div class="question-label" id="qLabel">Pregunta 1</div>
+                <div class="question-text" id="qText"></div>
+                <div class="options-list" id="optionsList"></div>
+            </div>
+            <div class="nav-section">
+                <div class="mark-toggle" id="markToggle">
+                    <span class="check">✓</span> Marcar para revisar
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-secondary" id="prevBtn">← Anterior</button>
+                    <button class="btn btn-secondary" id="nextBtn">Siguiente →</button>
+                    <button class="btn btn-primary hidden" id="finishBtn">Finalizar</button>
+                </div>
+            </div>
+            <div class="question-grid" id="qGrid"></div>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="container hidden" id="resultsScreen">
+            <div class="results-card">
+                <div class="results-header">
+                    <h2>Examen completado</h2>
+                    <p id="resultsTitle"></p>
+                </div>
+                <div class="pass-badge" id="passBadge"></div>
+                <div class="score-display">
+                    <div class="score-number"><span id="scoreVal">0</span><span>/10</span></div>
+                    <div class="score-label">Tu puntuación</div>
+                    <div class="score-bar"><div class="score-bar-fill" id="scoreBar" style="width: 0%"></div></div>
+                </div>
+                <div class="stats-cards">
+                    <div class="stats-card correct"><div class="icon">✓</div><div class="num" id="correctNum">0</div><div class="lbl">Correctas</div></div>
+                    <div class="stats-card incorrect"><div class="icon">✗</div><div class="num" id="incorrectNum">0</div><div class="lbl">Incorrectas</div></div>
+                    <div class="stats-card skip"><div class="icon">—</div><div class="num" id="skipNum">0</div><div class="lbl">Sin contestar</div></div>
+                </div>
+                <div class="review-section" id="reviewSection">
+                    <h3>Revisión de respuestas</h3>
+                    <div id="reviewList"></div>
+                </div>
+                <div class="results-actions">
+                    <button class="btn btn-secondary" id="homeBtn">← Volver al inicio</button>
+                    <button class="btn btn-gold hidden" id="certBtn">🏆 Ver Certificado</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HISTORY REVIEW -->
+        <div class="container hidden" id="historyReviewScreen">
+            <div class="results-card">
+                <div class="results-header">
+                    <h2>Revisión del examen</h2>
+                    <p id="hReviewTitle"></p>
+                </div>
+                <div class="score-display">
+                    <div class="score-number"><span id="hScoreVal">0</span><span>/10</span></div>
+                    <div class="score-label">Puntuación obtenida</div>
+                    <div class="score-bar"><div class="score-bar-fill" id="hScoreBar" style="width: 0%"></div></div>
+                </div>
+                <div class="review-section" id="hReviewSection">
+                    <h3>Tus respuestas</h3>
+                    <div id="hReviewList"></div>
+                </div>
+                <div class="results-actions">
+                    <button class="btn btn-secondary" id="backBtn">← Volver</button>
+                    <button class="btn btn-gold hidden" id="hCertBtn">🏆 Ver Certificado</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALS -->
+        <div class="modal-overlay" id="confirmModal">
+            <div class="modal">
+                <div class="modal-icon" style="background: rgba(234, 179, 8, 0.15);">⚠️</div>
+                <h3>¿Finalizar examen?</h3>
+                <p id="confirmMsg">¿Estás seguro?</p>
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                    <button class="btn btn-primary" id="confirmBtn">Finalizar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay profile-modal" id="profileModal">
+            <div class="modal">
+                <h3>Mi Perfil</h3>
+                <div class="profile-avatar-edit" id="avatarEdit">
+                    <div class="avatar-img" id="profileAvatar"></div>
+                    <div class="edit-badge">📷</div>
+                    <input type="file" id="avatarInput" accept="image/*">
+                </div>
+                <div class="profile-info">
+                    <h4 id="profileName"></h4>
+                    <p id="profileDNI"></p>
+                </div>
+                <button class="btn btn-secondary" id="closeProfileBtn" style="width: 100%;">Cerrar</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="certModal">
+            <div class="modal wide">
+                <div class="certificate-preview certificate-print" id="certificateContent"></div>
+                <div class="modal-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" id="closeCertBtn">Cerrar</button>
+                    <button class="btn btn-gold" id="printCertBtn">🖨️ Imprimir / Guardar PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="examEditModal">
+            <div class="modal xl">
+                <h3 id="examEditTitle">Nuevo Examen</h3>
+                <form id="examEditForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Título del examen</label>
+                            <input type="text" id="editExamTitle" required placeholder="Ej: Fotografía Básica">
+                        </div>
+                        <div class="form-group">
+                            <label>Icono (emoji)</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="editExamIcon" style="width: 60px; text-align: center; font-size: 24px;" value="📝">
+                                <button type="button" class="btn btn-secondary btn-sm" id="pickEmojiBtn">Elegir</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Tiempo (minutos)</label>
+                            <input type="number" id="editExamTime" required value="30" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Puntos por acierto</label>
+                            <input type="number" id="editExamPoints" required value="1" min="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Puntos por error</label>
+                            <input type="number" id="editExamPenalty" required value="0" min="0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha límite</label>
+                            <input type="date" id="editExamDeadline">
+                        </div>
+                        <div class="form-group">
+                            <label>Máximo de intentos</label>
+                            <select id="editExamAttempts">
+                                <option value="1">1 intento</option>
+                                <option value="2" selected>2 intentos (si suspenso)</option>
+                                <option value="999">Ilimitados</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Preguntas (JSON)</label>
+                        <textarea id="editExamQuestions" rows="10" placeholder='[{"t":"Pregunta","o":["A","B","C","D"],"c":0}]' style="font-family: monospace; font-size: 12px;"></textarea>
+                        <small style="color: var(--text-3);">Formato: t=texto, o=opciones (array), c=índice correcto (0-3)</small>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn btn-secondary" id="cancelExamBtn">Cancelar</button>
+                        <button type="submit" class="btn btn-success">💾 Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="emojiModal">
+            <div class="modal">
+                <h3>Selecciona un emoji</h3>
+                <div class="emoji-grid" id="emojiGrid"></div>
+                <button class="btn btn-secondary" id="closeEmojiBtn" style="width: 100%;">Cerrar</button>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="alertModal">
+            <div class="modal">
+                <div class="modal-icon" id="alertModalIcon" style="background: rgba(34, 197, 94, 0.15);">✓</div>
+                <h3 id="alertModalTitle">Éxito</h3>
+                <p id="alertModalMsg"></p>
+                <button class="btn btn-primary" id="closeAlertBtn" style="width: 100%;">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        const _h = s => s.split('').reduce((a,b) => (((a << 5) - a) + b.charCodeAt(0))|0, 0);
+        const _adminHash = 2058231765;
+        const _adminUser = 'admin';
+        const _key = 'bNw2024';
+        const _enc = str => btoa(unescape(encodeURIComponent(str))).split('').map((c,i) => 
+            String.fromCharCode(c.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))).join('');
+        const _dec = str => {
+            try {
+                const decoded = str.split('').map((c,i) => 
+                    String.fromCharCode(c.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))).join('');
+                return decodeURIComponent(escape(atob(decoded)));
+            } catch(e) { return null; }
+        };
+
+        const emojis = ['📷','🎞️','💡','🖼️','🎨','📐','🔬','💻','📱','🎮','📚','✏️','🎯','🧪','🔧','⚡','🌐','🎵','🎬','📊','💼','🏆','⭐','🚀','💎','🔥','✨','🌟','💫','🎁','🎪','🎭','🎪','🎢','🎡','🎠','🏅','🥇','🥈','🥉'];
+
+        const defaultExams = {
+            1: { title: "Fotografía Básica", icon: "📷", time: 1800, deadline: "2026-01-15", points: 1, penalty: 0, maxAttempts: 2,
+                q: [
+                    {t:"¿Qué es el triángulo de exposición?",o:["Un accesorio para estabilizar la cámara","La relación entre ISO, apertura y velocidad de obturación","Un tipo de composición fotográfica","El sensor de la cámara"],c:1},
+                    {t:"¿Qué controla la apertura del diafragma?",o:["El tiempo que el sensor está expuesto a la luz","La sensibilidad del sensor","La cantidad de luz que entra y la profundidad de campo","El enfoque automático"],c:2},
+                    {t:"Un número f/ bajo (ej: f/1.8) significa:",o:["Menor entrada de luz y mayor profundidad de campo","Mayor entrada de luz y menor profundidad de campo","Imagen más oscura","Mayor velocidad de obturación"],c:1},
+                    {t:"¿Qué es el ISO en fotografía?",o:["Un formato de archivo de imagen","La sensibilidad del sensor a la luz","El tamaño del sensor","La distancia focal del objetivo"],c:1},
+                    {t:"¿Qué sucede al aumentar mucho el ISO?",o:["La imagen se vuelve más nítida","Aparece más ruido/grano en la imagen","Los colores se saturan más","Se reduce la profundidad de campo"],c:1},
+                    {t:"La regla de los tercios consiste en:",o:["Usar siempre tres fuentes de luz","Dividir la imagen en 9 partes y situar elementos en las intersecciones","Fotografiar solo en formato 3:2","Usar tres colores principales"],c:1},
+                    {t:"¿Qué es la profundidad de campo?",o:["La distancia entre la cámara y el sujeto","La zona de la imagen que aparece enfocada","La cantidad de megapíxeles del sensor","El ángulo de visión del objetivo"],c:1},
+                    {t:"Una velocidad de obturación de 1/1000 es:",o:["Muy lenta, ideal para larga exposición","Muy rápida, ideal para congelar movimiento","Estándar para retratos","Solo útil en fotografía nocturna"],c:1},
+                    {t:"El balance de blancos sirve para:",o:["Aumentar el contraste de la imagen","Corregir la dominante de color según la luz","Enfocar correctamente","Reducir el ruido"],c:1},
+                    {t:"¿Qué tipo de objetivo tiene una distancia focal de 50mm?",o:["Gran angular","Teleobjetivo","Objetivo estándar/normal","Ojo de pez"],c:2},
+                    {t:"El formato RAW se caracteriza por:",o:["Ocupar menos espacio que JPEG","Guardar toda la información del sensor sin comprimir","Ser compatible con todas las aplicaciones","Tener los colores ya procesados"],c:1},
+                    {t:"¿Qué es el bokeh?",o:["Un tipo de flash externo","El desenfoque estético del fondo","Una técnica de iluminación","Un filtro de color"],c:1},
+                    {t:"Para fotografiar un paisaje con todo enfocado, necesitas:",o:["Apertura amplia (f/1.8)","Apertura cerrada (f/11 o superior)","ISO muy alto","Velocidad muy rápida"],c:1},
+                    {t:"¿Qué es la luz dura?",o:["Luz que crea sombras suaves y difusas","Luz direccional que crea sombras marcadas y definidas","La luz del amanecer","Luz artificial de estudio"],c:1},
+                    {t:"El histograma de una foto nos muestra:",o:["Los metadatos de la imagen","La distribución de tonos claros y oscuros","El tamaño en megapíxeles","La temperatura de color"],c:1}
+                ]
+            },
+            2: { title: "Fotografía Avanzada", icon: "🎞️", time: 2400, deadline: "2026-01-20", points: 1, penalty: 0.25, maxAttempts: 2,
+                q: [
+                    {t:"¿Qué es la hiperfocal?",o:["La distancia mínima de enfoque","La distancia a la que enfocar para maximizar la profundidad de campo","El punto más lejano que puede enfocar un objetivo","La distancia entre el sensor y el objetivo"],c:1},
+                    {t:"El bracketing de exposición consiste en:",o:["Usar un trípode especial","Tomar varias fotos con diferentes exposiciones","Combinar varias fotos en una sola","Ajustar el balance de blancos automáticamente"],c:1},
+                    {t:"¿Para qué sirve el modo bulb?",o:["Para fotografía macro","Para exposiciones muy largas controladas manualmente","Para sincronizar con flash","Para fotografía deportiva"],c:1},
+                    {t:"¿Qué es el efecto moiré?",o:["Un tipo de viñeteo","Un patrón de interferencia que aparece en tejidos finos","Un efecto de desenfoque circular","Una aberración cromática"],c:1},
+                    {t:"La técnica de 'dragging the shutter' se usa para:",o:["Congelar el movimiento","Combinar flash con luz ambiente en exposiciones largas","Crear efecto de zoom","Fotografiar estrellas"],c:1},
+                    {t:"¿Qué es el 'focus stacking'?",o:["Un tipo de enfoque automático","Combinar varias fotos con diferentes puntos de enfoque","Una técnica de iluminación","El apilamiento de filtros"],c:1},
+                    {t:"El número guía de un flash indica:",o:["Su temperatura de color","Su potencia y alcance","Su velocidad de reciclado","Su ángulo de cobertura"],c:1},
+                    {t:"¿Qué es la sincronización de alta velocidad (HSS)?",o:["Usar velocidades superiores a 1/250s con flash","Disparar en ráfaga rápida","Sincronizar múltiples cámaras","Un modo de enfoque rápido"],c:0},
+                    {t:"La difracción óptica en fotografía ocurre cuando:",o:["Usamos aperturas muy abiertas","Usamos aperturas muy cerradas (f/16+)","Fotografiamos a través de cristal","Usamos teleobjetivos"],c:1},
+                    {t:"¿Qué ventaja tiene el sensor full frame sobre APS-C?",o:["Es más barato","Mejor rendimiento en ISO alto y profundidad de campo","Tiene más alcance (crop factor)","Es más ligero"],c:1}
+                ]
+            },
+            3: { title: "Iluminación Fotográfica", icon: "💡", time: 1800, deadline: "2026-01-25", points: 1, penalty: 0, maxAttempts: 2,
+                q: [
+                    {t:"¿Qué es un softbox?",o:["Un estuche para guardar equipo","Un modificador que suaviza la luz del flash","Un tipo de trípode","Un filtro de densidad neutra"],c:1},
+                    {t:"La luz de relleno (fill light) sirve para:",o:["Ser la luz principal","Reducir las sombras creadas por la luz principal","Crear efectos especiales","Iluminar el fondo"],c:1},
+                    {t:"¿Qué es un reflector de 5 en 1?",o:["Un objetivo especial","Un reflector con 5 superficies intercambiables","Un flash con 5 modos","Una luz LED con 5 temperaturas"],c:1},
+                    {t:"La iluminación Rembrandt se caracteriza por:",o:["Iluminación plana y uniforme","Un triángulo de luz en la mejilla del lado en sombra","Luz completamente lateral","Luz desde abajo"],c:1},
+                    {t:"¿Qué temperatura de color tiene la luz de tungsteno?",o:["2700-3200K (cálida/amarillenta)","5500K (neutra)","6500K (fría/azulada)","10000K (muy fría)"],c:0},
+                    {t:"Un beauty dish produce:",o:["Luz muy suave como un softbox grande","Luz dura como flash directo","Luz semi-suave con más contraste que un softbox","Luz coloreada"],c:2},
+                    {t:"¿Para qué sirve un snoot?",o:["Suavizar la luz","Concentrar la luz en un haz estrecho","Difundir la luz en todas direcciones","Cambiar el color de la luz"],c:1},
+                    {t:"El esquema de iluminación 'clamshell' usa:",o:["Una sola luz lateral","Dos luces, una arriba y otra abajo del sujeto","Luz trasera únicamente","Cuatro luces en cruz"],c:1},
+                    {t:"¿Qué es la ley del inverso del cuadrado en iluminación?",o:["La luz pierde intensidad proporcionalmente al cuadrado de la distancia","La luz se duplica al acercarse a la mitad","El tamaño de la fuente determina la dureza","Mayor ISO requiere menos luz"],c:0},
+                    {t:"Un gel de color en el flash sirve para:",o:["Proteger el flash del calor","Modificar la temperatura o color de la luz","Aumentar la potencia","Difundir la luz"],c:1}
+                ]
+            }
+        };
+
+        let S = {
+            user: null,
+            isAdmin: false,
+            theme: 'dark',
+            exam: null,
+            examId: null,
+            qIdx: 0,
+            answers: [],
+            marked: [],
+            timeLeft: 0,
+            timer: null,
+            shuffleMap: [],
+            editingExamId: null
+        };
+
+        function getExams() {
+            const imported = localStorage.getItem('bnw_exams');
+            const custom = imported ? JSON.parse(_dec(imported) || '{}') : {};
+            return { ...defaultExams, ...custom };
+        }
+
+        function saveExams(exams) {
+            localStorage.setItem('bnw_exams', _enc(JSON.stringify(exams)));
+        }
+
+        const $ = id => document.getElementById(id);
+        const screens = { login: $('loginScreen'), dash: $('dashboardScreen'), admin: $('adminScreen'), exam: $('examScreen'), results: $('resultsScreen'), hReview: $('historyReviewScreen') };
+
+        function setTheme(t) {
+            S.theme = t;
+            $('app').dataset.theme = t;
+            $('themeBtn').textContent = t === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('bnw_theme', t);
+        }
+
+        function saveResults(r) { localStorage.setItem('bnw_r', _enc(JSON.stringify(r))); }
+        function loadResults() {
+            const d = localStorage.getItem('bnw_r');
+            if (!d) return [];
+            const dec = _dec(d);
+            return dec ? JSON.parse(dec) : [];
+        }
+        function saveSession() { localStorage.setItem('bnw_s', _enc(JSON.stringify({ u: S.user, a: S.isAdmin }))); }
+        function loadSession() {
+            const d = localStorage.getItem('bnw_s');
+            if (!d) return null;
+            const dec = _dec(d);
+            return dec ? JSON.parse(dec) : null;
+        }
+
+        function showScreen(name) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            screens[name].classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function updateHeader() {
+            const menu = $('userMenu');
+            if (S.user) {
+                menu.classList.remove('hidden');
+                $('headerName').textContent = S.user.name;
+                const av = $('headerAvatar');
+                av.innerHTML = S.user.avatar ? `<img src="${S.user.avatar}" alt="">` : S.user.name.charAt(0).toUpperCase();
+                $('adminBadge').classList.toggle('hidden', !S.isAdmin);
+            } else {
+                menu.classList.add('hidden');
+            }
+        }
+
+        function getAttempts(examId, dni) {
+            return loadResults().filter(r => r.examId === examId && r.dni === dni);
+        }
+
+        function canRetake(examId, dni) {
+            const attempts = getAttempts(examId, dni);
+            if (attempts.length === 0) return true;
+            const exams = getExams();
+            const exam = exams[examId];
+            const maxAttempts = exam.maxAttempts || 2;
+            const passed = attempts.some(a => a.score >= 5);
+            if (passed) return false;
+            return attempts.length < maxAttempts;
+        }
+
+        function canViewReview(examId, dni) {
+            const attempts = getAttempts(examId, dni);
+            if (attempts.length === 0) return false;
+            const exams = getExams();
+            const exam = exams[examId];
+            const maxAttempts = exam.maxAttempts || 2;
+            const passed = attempts.some(a => a.score >= 5);
+            if (passed) return true;
+            return attempts.length >= maxAttempts;
+        }
+
+        function checkPendingExams() {
+            if (S.isAdmin) { $('alertBanner').classList.add('hidden'); return; }
+            const results = loadResults().filter(r => r.dni === S.user.dni);
+            const exams = getExams();
+            const pending = [];
+            const now = new Date();
+            Object.entries(exams).forEach(([id, exam]) => {
+                const attempts = results.filter(r => r.examId === parseInt(id));
+                const passed = attempts.some(a => a.score >= 5);
+                const maxAttempts = exam.maxAttempts || 2;
+                if (!passed && attempts.length < maxAttempts && exam.deadline) {
+                    const deadline = new Date(exam.deadline);
+                    if (deadline > now) pending.push({ id, exam, deadline });
+                }
+            });
+            if (pending.length > 0) {
+                pending.sort((a, b) => a.deadline - b.deadline);
+                const dateStr = pending[0].deadline.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+                $('alertDeadline').textContent = dateStr;
+                $('alertBanner').classList.remove('hidden');
+            } else {
+                $('alertBanner').classList.add('hidden');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = $('nameInput').value.trim();
+            const dni = $('dniInput').value.trim();
+            if (name.toLowerCase() === _adminUser && _h(dni) === _adminHash) {
+                $('nameGroup').classList.remove('error');
+                $('dniGroup').classList.remove('error');
+                S.isAdmin = true;
+                S.user = { name: 'Administrador', dni: 'ADMIN' };
+                saveSession();
+                updateHeader();
+                loadAdmin();
+                showScreen('admin');
+                checkPendingExams();
+                return;
+            }
+            let valid = true;
+            if (name.length < 3) { $('nameGroup').classList.add('error'); valid = false; } else { $('nameGroup').classList.remove('error'); }
+            if (!/^[0-9]{8}[A-Za-z]$/.test(dni)) { $('dniGroup').classList.add('error'); valid = false; } else { $('dniGroup').classList.remove('error'); }
+            if (valid) {
+                S.isAdmin = false;
+                S.user = { name, dni: dni.toUpperCase() };
+                saveSession();
+                updateHeader();
+                loadExamGrid();
+                loadHistory();
+                checkPendingExams();
+                showScreen('dash');
+            }
+        }
+
+        function logout() {
+            S.user = null;
+            S.isAdmin = false;
+            localStorage.removeItem('bnw_s');
+            $('nameInput').value = '';
+            $('dniInput').value = '';
+            updateHeader();
+            $('alertBanner').classList.add('hidden');
+            showScreen('login');
+        }
+
+        function loadExamGrid() {
+            const exams = getExams();
+            const results = loadResults().filter(r => r.dni === S.user.dni);
+            const grid = $('examGrid');
+            grid.innerHTML = Object.entries(exams).map(([id, exam]) => {
+                const attempts = results.filter(r => r.examId === parseInt(id));
+                const passed = attempts.some(a => a.score >= 5);
+                const maxAttempts = exam.maxAttempts || 2;
+                const canDo = canRetake(parseInt(id), S.user.dni);
+                const deadlineStr = exam.deadline ? new Date(exam.deadline).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : '';
+                let statusHtml = '';
+                if (attempts.length > 0) {
+                    const best = Math.max(...attempts.map(a => a.score));
+                    if (passed) {
+                        statusHtml = `<div class="exam-status passed">✓ Aprobado (${best.toFixed(1)})<span class="attempts-badge">${attempts.length}/${maxAttempts} intentos</span></div>`;
+                    } else if (!canDo) {
+                        statusHtml = `<div class="exam-status failed">✗ Suspenso (${best.toFixed(1)})<span class="attempts-badge">Intentos agotados</span></div>`;
+                    } else {
+                        statusHtml = `<div class="exam-status pending">⚠ Intento ${attempts.length}/${maxAttempts} - ${best.toFixed(1)}</div>`;
+                    }
+                }
+                return `
+                    <div class="exam-card ${!canDo ? 'locked' : ''}" data-exam="${id}" data-can="${canDo}">
+                        <div class="exam-card-head">
+                            <div class="exam-icon">${exam.icon || '📝'}</div>
+                            <div>
+                                <h3>${exam.title}</h3>
+                                <p>${exam.q.length} preguntas · ${Math.floor(exam.time/60)} min</p>
+                            </div>
+                        </div>
+                        <div class="exam-card-meta">
+                            ${deadlineStr ? `<span>📅 Límite: ${deadlineStr}</span>` : ''}
+                            ${exam.penalty > 0 ? `<span>⚠️ Penaliza errores</span>` : ''}
+                        </div>
+                        ${statusHtml}
+                    </div>
+                `;
+            }).join('');
+            grid.querySelectorAll('.exam-card').forEach(c => {
+                c.onclick = () => {
+                    const canDo = c.dataset.can === 'true';
+                    if (canDo) startExam(parseInt(c.dataset.exam));
+                    else showAlert('Examen bloqueado', 'Ya has completado este examen o agotado tus intentos.', 'warning');
+                };
+            });
+        }
+
+        function loadHistory() {
+            const r = loadResults().filter(x => x.dni === S.user.dni);
+            const cont = $('historyContent');
+            if (r.length === 0) {
+                cont.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>Sin exámenes</h3><p>Aquí aparecerán tus resultados</p></div>`;
+                return;
+            }
+            r.sort((a, b) => new Date(b.date) - new Date(a.date));
+            cont.innerHTML = r.map((x, i) => {
+                const date = new Date(x.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const cls = x.score >= 9 ? 'excellent' : x.score >= 7 ? 'good' : x.score >= 5 ? 'regular' : 'poor';
+                const total = x.correct + x.incorrect + x.unanswered;
+                const passed = x.score >= 5;
+                const canView = canViewReview(x.examId, S.user.dni);
+                return `
+                    <div class="history-item" data-idx="${i}">
+                        <div class="history-score ${cls}">${x.score.toFixed(1)}</div>
+                        <div class="history-info">
+                            <h4>${x.examTitle}</h4>
+                            <p>${date} · ${x.correct}/${total} correctas</p>
+                        </div>
+                        <div class="history-actions">
+                            <button class="icon-btn view-btn" data-idx="${i}" data-can="${canView}" title="${canView ? 'Ver respuestas' : 'Respuestas bloqueadas'}">👁️</button>
+                            ${passed ? `<button class="icon-btn cert-view-btn" data-idx="${i}" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: white;">🏆</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            cont.querySelectorAll('.view-btn').forEach(b => b.onclick = e => { e.stopPropagation(); viewResult(parseInt(b.dataset.idx), 'history', b.dataset.can === 'true'); });
+            cont.querySelectorAll('.cert-view-btn').forEach(b => b.onclick = e => { e.stopPropagation(); showCertificate(parseInt(b.dataset.idx)); });
+            cont.querySelectorAll('.history-item').forEach(i => {
+                const viewBtn = i.querySelector('.view-btn');
+                i.onclick = () => viewResult(parseInt(i.dataset.idx), 'history', viewBtn.dataset.can === 'true');
+            });
+        }
+
+        function viewResult(idx, from, canView = true) {
+            let r;
+            if (from === 'admin') {
+                r = loadResults();
+                r.sort((a, b) => new Date(b.date) - new Date(a.date));
+                r = r[idx];
+                canView = true;
+            } else {
+                r = loadResults().filter(x => x.dni === S.user.dni);
+                r.sort((a, b) => new Date(b.date) - new Date(a.date));
+                r = r[idx];
+            }
+            if (!r) return;
+            $('hReviewTitle').textContent = r.examTitle + (from === 'admin' ? ` - ${r.name}` : '');
+            $('hScoreVal').textContent = r.score.toFixed(1);
+            const pct = Math.round((r.correct / (r.correct + r.incorrect + r.unanswered)) * 100);
+            const cls = r.score >= 9 ? 'excellent' : r.score >= 7 ? 'good' : r.score >= 5 ? 'regular' : 'poor';
+            const bar = $('hScoreBar');
+            bar.className = 'score-bar-fill ' + cls;
+            bar.style.width = '0%';
+            setTimeout(() => bar.style.width = pct + '%', 100);
+            const reviewSection = $('hReviewSection');
+            if (canView) {
+                reviewSection.innerHTML = `<h3>Tus respuestas</h3><div id="hReviewList"></div>`;
+                renderReview($('hReviewList'), r);
+            } else {
+                reviewSection.innerHTML = `<div class="review-locked"><div class="icon">🔒</div><h3>Respuestas bloqueadas</h3><p>Podrás ver las respuestas cuando agotes todos tus intentos.</p></div>`;
+            }
+            const passed = r.score >= 5;
+            const hCertBtn = $('hCertBtn');
+            if (passed && from !== 'admin') {
+                hCertBtn.classList.remove('hidden');
+                hCertBtn.onclick = () => showCertificateData(r);
+            } else { hCertBtn.classList.add('hidden'); }
+            $('backBtn').onclick = () => {
+                if (from === 'admin') showScreen('admin');
+                else { document.querySelector('[data-tab="history"]').click(); showScreen('dash'); }
+            };
+            showScreen('hReview');
+        }
+
+        function renderReview(cont, r) {
+            const exams = getExams();
+            const exam = exams[r.examId];
+            if (!exam) { cont.innerHTML = '<p>Examen no encontrado</p>'; return; }
+            const letters = ['A', 'B', 'C', 'D'];
+            cont.innerHTML = exam.q.map((q, i) => {
+                const ua = r.answers ? r.answers[i] : null;
+                const ok = ua === q.c;
+                const skip = ua === null || ua === undefined;
+                const clsItem = skip ? 'skip' : ok ? 'correct' : 'incorrect';
+                let ans = '';
+                if (skip) {
+                    ans = `<p class="user-ans">Sin contestar</p><p class="correct-ans">✓ ${letters[q.c]}) ${q.o[q.c]}</p>`;
+                } else if (ok) {
+                    ans = `<p class="user-ans is-correct">✓ ${letters[ua]}) ${q.o[ua]}</p>`;
+                } else {
+                    ans = `<p class="user-ans">✗ ${letters[ua]}) ${q.o[ua]}</p><p class="correct-ans">✓ ${letters[q.c]}) ${q.o[q.c]}</p>`;
+                }
+                return `<div class="review-item ${clsItem}"><div class="review-item-head"><div class="review-item-num">${i + 1}</div><div class="review-item-q">${q.t}</div></div><div class="review-answers">${ans}</div></div>`;
+            }).join('');
+        }
+
+        function loadAdmin() {
+            loadAdminStats();
+            loadAdminResults();
+            loadRanking();
+            loadExamManager();
+        }
+
+        function loadAdminStats() {
+            const r = loadResults();
+            const students = [...new Set(r.map(x => x.dni))].length;
+            const exams = r.length;
+            const avg = r.length > 0 ? (r.reduce((s, x) => s + x.score, 0) / r.length).toFixed(1) : '0';
+            const passed = r.filter(x => x.score >= 5).length;
+            const passRate = r.length > 0 ? Math.round((passed / r.length) * 100) : 0;
+            $('statStudents').textContent = students;
+            $('statExams').textContent = exams;
+            $('statAvg').textContent = avg;
+            $('statPass').textContent = passRate + '%';
+            const grades = { '0-2': 0, '2-4': 0, '4-5': 0, '5-6': 0, '6-8': 0, '8-10': 0 };
+            r.forEach(x => {
+                if (x.score < 2) grades['0-2']++;
+                else if (x.score < 4) grades['2-4']++;
+                else if (x.score < 5) grades['4-5']++;
+                else if (x.score < 6) grades['5-6']++;
+                else if (x.score < 8) grades['6-8']++;
+                else grades['8-10']++;
+            });
+            const maxGrade = Math.max(...Object.values(grades), 1);
+            $('gradeChart').innerHTML = Object.entries(grades).map(([label, count]) => `
+                <div class="bar-item">
+                    <div class="bar" style="height: ${Math.max((count / maxGrade) * 160, 4)}px;" data-value="${count}"></div>
+                    <div class="bar-label">${label}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadAdminResults() {
+            const r = loadResults();
+            const tbody = $('tableBody');
+            if (r.length === 0) {
+                tbody.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>Sin resultados</h3></div>`;
+                return;
+            }
+            r.sort((a, b) => new Date(b.date) - new Date(a.date));
+            tbody.innerHTML = r.map((x, i) => {
+                const cls = x.score >= 9 ? 'excellent' : x.score >= 7 ? 'good' : x.score >= 5 ? 'regular' : 'poor';
+                const total = x.correct + x.incorrect + x.unanswered;
+                return `
+                    <div class="table-row" data-idx="${i}">
+                        <div><span class="name">${x.name}</span><br><span class="dni">${x.dni}</span></div>
+                        <span class="exam">${x.examTitle}</span>
+                        <span class="score ${cls}">${x.score.toFixed(1)}</span>
+                        <span class="aciertos">${x.correct}/${total}</span>
+                    </div>
+                `;
+            }).join('');
+            tbody.querySelectorAll('.table-row').forEach(row => {
+                row.onclick = () => viewResult(parseInt(row.dataset.idx), 'admin');
+            });
+        }
+
+        function loadRanking() {
+            const results = loadResults();
+            const studentScores = {};
+            results.forEach(r => {
+                if (!studentScores[r.dni]) studentScores[r.dni] = { name: r.name, dni: r.dni, total: 0, count: 0 };
+                studentScores[r.dni].total += r.score;
+                studentScores[r.dni].count++;
+            });
+            const ranking = Object.values(studentScores).map(s => ({ ...s, avg: s.total / s.count })).sort((a, b) => b.avg - a.avg).slice(0, 20);
+            const cont = $('adminRankingContent');
+            if (ranking.length === 0) {
+                cont.innerHTML = `<div class="empty-state"><div class="icon">🏆</div><h3>Sin datos de ranking</h3></div>`;
+                return;
+            }
+            cont.innerHTML = `<div class="ranking-list">${ranking.map((s, i) => {
+                const pos = i + 1;
+                const topClass = pos === 1 ? 'top-1' : pos === 2 ? 'top-2' : pos === 3 ? 'top-3' : '';
+                const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : '';
+                return `
+                    <div class="ranking-item ${topClass}">
+                        <div class="ranking-pos">${pos}</div>
+                        <div class="ranking-info"><h4>${s.name}</h4><p>${s.count} exámenes · DNI: ${s.dni}</p></div>
+                        <div class="ranking-score">${s.avg.toFixed(1)}</div>
+                        ${medal ? `<div class="ranking-medal">${medal}</div>` : ''}
+                    </div>
+                `;
+            }).join('')}</div>`;
+        }
+
+        function loadExamManager() {
+            const exams = getExams();
+            const grid = $('examManagerGrid');
+            grid.innerHTML = Object.entries(exams).map(([id, exam]) => `
+                <div class="exam-manager-item" data-id="${id}">
+                    <div class="exam-manager-icon" data-id="${id}" title="Cambiar icono">${exam.icon || '📝'}</div>
+                    <div class="exam-manager-info">
+                        <h4>${exam.title}</h4>
+                        <p>${exam.q.length} preguntas · ${Math.floor(exam.time/60)} min · Límite: ${exam.deadline || 'Sin límite'} · Intentos: ${exam.maxAttempts || 2}</p>
+                    </div>
+                    <div class="exam-manager-actions">
+                        <button class="btn btn-sm btn-secondary edit-exam-btn" data-id="${id}">✏️ Editar</button>
+                        <button class="btn btn-sm btn-danger delete-exam-btn" data-id="${id}">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+            grid.querySelectorAll('.exam-manager-icon').forEach(icon => {
+                icon.onclick = e => {
+                    e.stopPropagation();
+                    showEmojiPicker(parseInt(icon.dataset.id));
+                };
+            });
+            grid.querySelectorAll('.edit-exam-btn').forEach(btn => {
+                btn.onclick = () => editExam(parseInt(btn.dataset.id));
+            });
+            grid.querySelectorAll('.delete-exam-btn').forEach(btn => {
+                btn.onclick = () => {
+                    if (confirm('¿Eliminar este examen? Se perderán todos los datos.')) {
+                        const exams = getExams();
+                        delete exams[btn.dataset.id];
+                        saveExams(exams);
+                        loadExamManager();
+                        showAlert('Eliminado', 'El examen ha sido eliminado.', 'success');
+                    }
+                };
+            });
+        }
+
+        function showEmojiPicker(examId) {
+            const grid = $('emojiGrid');
+            grid.innerHTML = emojis.map(e => `<div class="emoji-item" data-emoji="${e}">${e}</div>`).join('');
+            grid.querySelectorAll('.emoji-item').forEach(item => {
+                item.onclick = () => {
+                    const exams = getExams();
+                    exams[examId].icon = item.dataset.emoji;
+                    saveExams(exams);
+                    loadExamManager();
+                    $('emojiModal').classList.remove('active');
+                };
+            });
+            $('emojiModal').classList.add('active');
+        }
+
+        function editExam(id) {
+            S.editingExamId = id;
+            const exams = getExams();
+            const exam = id ? exams[id] : null;
+            $('examEditTitle').textContent = id ? 'Editar Examen' : 'Nuevo Examen';
+            $('editExamTitle').value = exam?.title || '';
+            $('editExamIcon').value = exam?.icon || '📝';
+            $('editExamTime').value = exam ? Math.floor(exam.time / 60) : 30;
+            $('editExamPoints').value = exam?.points || 1;
+            $('editExamPenalty').value = exam?.penalty || 0;
+            $('editExamDeadline').value = exam?.deadline || '';
+            $('editExamAttempts').value = exam?.maxAttempts || 2;
+            $('editExamQuestions').value = exam ? JSON.stringify(exam.q, null, 2) : '';
+            $('examEditModal').classList.add('active');
+        }
+
+        function saveExamEdit(e) {
+            e.preventDefault();
+            try {
+                const questions = JSON.parse($('editExamQuestions').value);
+                if (!Array.isArray(questions) || questions.length === 0) throw new Error('Preguntas inválidas');
+                const examData = {
+                    title: $('editExamTitle').value,
+                    icon: $('editExamIcon').value || '📝',
+                    time: parseInt($('editExamTime').value) * 60,
+                    points: parseFloat($('editExamPoints').value),
+                    penalty: parseFloat($('editExamPenalty').value),
+                    deadline: $('editExamDeadline').value || null,
+                    maxAttempts: parseInt($('editExamAttempts').value),
+                    q: questions
+                };
+                const exams = getExams();
+                const id = S.editingExamId || (Math.max(0, ...Object.keys(exams).map(Number)) + 1);
+                exams[id] = examData;
+                saveExams(exams);
+                $('examEditModal').classList.remove('active');
+                loadExamManager();
+                showAlert('Guardado', 'El examen ha sido guardado correctamente.', 'success');
+            } catch (err) {
+                showAlert('Error', 'Error en el formato de las preguntas: ' + err.message, 'error');
+            }
+        }
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function startExam(id) {
+            const exams = getExams();
+            S.examId = id;
+            S.exam = exams[id];
+            if (!S.exam) return;
+            S.shuffleMap = shuffleArray(S.exam.q.map((_, i) => i));
+            S.qIdx = 0;
+            S.answers = new Array(S.exam.q.length).fill(null);
+            S.marked = new Array(S.exam.q.length).fill(false);
+            S.timeLeft = S.exam.time;
+            $('examTitle').textContent = S.exam.title;
+            renderGrid();
+            renderQuestion();
+            startTimer();
+            showScreen('exam');
+        }
+
+        function renderQuestion() {
+            const origIdx = S.shuffleMap[S.qIdx];
+            const q = S.exam.q[origIdx];
+            const total = S.exam.q.length;
+            const answered = S.answers.filter(a => a !== null).length;
+            $('qCounter').textContent = `Pregunta ${S.qIdx + 1} de ${total}`;
+            $('aCounter').textContent = `${answered} respondidas`;
+            $('progressFill').style.width = `${((S.qIdx + 1) / total) * 100}%`;
+            $('qLabel').textContent = `Pregunta ${S.qIdx + 1}`;
+            $('qText').textContent = q.t;
+            const letters = ['A', 'B', 'C', 'D'];
+            $('optionsList').innerHTML = q.o.map((o, i) => `
+                <div class="option ${S.answers[origIdx] === i ? 'selected' : ''}" data-idx="${i}">
+                    <span class="letter">${letters[i]}</span>
+                    <span class="text">${o}</span>
+                </div>
+            `).join('');
+            $('optionsList').querySelectorAll('.option').forEach(o => {
+                o.onclick = () => { S.answers[origIdx] = parseInt(o.dataset.idx); renderQuestion(); };
+            });
+            $('markToggle').classList.toggle('active', S.marked[S.qIdx]);
+            $('prevBtn').disabled = S.qIdx === 0;
+            if (S.qIdx === total - 1) { $('nextBtn').classList.add('hidden'); $('finishBtn').classList.remove('hidden'); }
+            else { $('nextBtn').classList.remove('hidden'); $('finishBtn').classList.add('hidden'); }
+            updateGrid();
+        }
+
+        function renderGrid() {
+            $('qGrid').innerHTML = S.exam.q.map((_, i) => `<div class="q-num" data-idx="${i}">${i + 1}</div>`).join('');
+            $('qGrid').querySelectorAll('.q-num').forEach(n => {
+                n.onclick = () => { S.qIdx = parseInt(n.dataset.idx); renderQuestion(); };
+            });
+        }
+
+        function updateGrid() {
+            $('qGrid').querySelectorAll('.q-num').forEach((n, i) => {
+                n.classList.remove('current', 'answered', 'marked');
+                const origIdx = S.shuffleMap[i];
+                if (i === S.qIdx) n.classList.add('current');
+                else if (S.answers[origIdx] !== null) n.classList.add('answered');
+                if (S.marked[i]) n.classList.add('marked');
+            });
+        }
+
+        function startTimer() {
+            if (S.timer) clearInterval(S.timer);
+            updateTimer();
+            S.timer = setInterval(() => {
+                S.timeLeft--;
+                updateTimer();
+                if (S.timeLeft <= 0) { clearInterval(S.timer); finishExam(); }
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const m = Math.floor(S.timeLeft / 60);
+            const s = S.timeLeft % 60;
+            const t = $('timer');
+            t.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            t.classList.remove('warning', 'danger');
+            if (S.timeLeft <= 60) t.classList.add('danger');
+            else if (S.timeLeft <= 300) t.classList.add('warning');
+        }
+
+        function showConfirm() {
+            const u = S.answers.filter(a => a === null).length;
+            $('confirmMsg').textContent = u > 0 ? `Tienes ${u} pregunta${u > 1 ? 's' : ''} sin contestar. ¿Finalizar?` : '¿Estás seguro de que quieres finalizar?';
+            $('confirmModal').classList.add('active');
+        }
+
+        function hideConfirm() { $('confirmModal').classList.remove('active'); }
+
+        function finishExam() {
+            if (S.timer) clearInterval(S.timer);
+            const points = S.exam.points || 1;
+            const penalty = S.exam.penalty || 0;
+            let correct = 0, incorrect = 0, unanswered = 0;
+            S.answers.forEach((a, i) => {
+                if (a === null) unanswered++;
+                else if (a === S.exam.q[i].c) correct++;
+                else incorrect++;
+            });
+            const rawScore = (correct * points) - (incorrect * penalty);
+            const maxScore = S.exam.q.length * points;
+            const score = Math.max(0, Math.min(10, (rawScore / maxScore) * 10));
+            const pct = Math.round((correct / S.exam.q.length) * 100);
+            const passed = score >= 5;
+            const result = {
+                examId: S.examId,
+                examTitle: S.exam.title,
+                name: S.user.name,
+                dni: S.user.dni,
+                score, correct, incorrect, unanswered,
+                answers: [...S.answers],
+                date: new Date().toISOString()
+            };
+            const r = loadResults();
+            r.push(result);
+            saveResults(r);
+            $('resultsTitle').textContent = S.exam.title;
+            $('scoreVal').textContent = score.toFixed(1);
+            $('correctNum').textContent = correct;
+            $('incorrectNum').textContent = incorrect;
+            $('skipNum').textContent = unanswered;
+            const cls = score >= 9 ? 'excellent' : score >= 7 ? 'good' : score >= 5 ? 'regular' : 'poor';
+            const bar = $('scoreBar');
+            bar.className = 'score-bar-fill ' + cls;
+            bar.style.width = '0%';
+            setTimeout(() => bar.style.width = pct + '%', 100);
+            const passBadge = $('passBadge');
+            passBadge.className = 'pass-badge ' + (passed ? 'passed' : 'failed');
+            passBadge.innerHTML = passed ? '✓ APROBADO' : '✗ SUSPENSO';
+            const canView = canViewReview(S.examId, S.user.dni);
+            const reviewSection = $('reviewSection');
+            if (canView) {
+                reviewSection.innerHTML = `<h3>Revisión de respuestas</h3><div id="reviewList"></div>`;
+                renderReview($('reviewList'), result);
+            } else {
+                const attemptsLeft = (S.exam.maxAttempts || 2) - getAttempts(S.examId, S.user.dni).length;
+                reviewSection.innerHTML = `<div class="review-locked"><div class="icon">🔒</div><h3>Respuestas bloqueadas</h3><p>Te queda${attemptsLeft !== 1 ? 'n' : ''} ${attemptsLeft} intento${attemptsLeft !== 1 ? 's' : ''}. Podrás ver las respuestas cuando apruebes o agotes tus intentos.</p></div>`;
+            }
+            const certBtn = $('certBtn');
+            if (passed) { certBtn.classList.remove('hidden'); certBtn.onclick = () => showCertificateData(result); }
+            else { certBtn.classList.add('hidden'); }
+            if (passed) launchConfetti();
+            showScreen('results');
+        }
+
+        function launchConfetti() {
+            const container = document.createElement('div');
+            container.className = 'confetti-container';
+            document.body.appendChild(container);
+            const colors = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6'];
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                container.appendChild(confetti);
+            }
+            setTimeout(() => container.remove(), 5000);
+        }
+
+        function showCertificate(idx) {
+            const r = loadResults().filter(x => x.dni === S.user.dni);
+            r.sort((a, b) => new Date(b.date) - new Date(a.date));
+            showCertificateData(r[idx]);
+        }
+
+        function showCertificateData(result) {
+            const date = new Date(result.date).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+            const certId = btoa(result.dni + result.date).slice(0, 12).toUpperCase();
+            $('certificateContent').innerHTML = `
+                <div class="cert-border">
+                    <div class="cert-corner tl"></div><div class="cert-corner tr"></div><div class="cert-corner bl"></div><div class="cert-corner br"></div>
+                    <div class="cert-logo">Benowu</div>
+                    <div class="cert-subtitle">Educación Online · Certificado de Aprovechamiento</div>
+                    <div class="cert-title">Certificado de Finalización</div>
+                    <div class="cert-text">Este documento certifica que</div>
+                    <div class="cert-name">${result.name}</div>
+                    <div class="cert-text">ha completado satisfactoriamente el curso</div>
+                    <div class="cert-course">${result.examTitle}</div>
+                    <div class="cert-score">Calificación: ${result.score.toFixed(1)} / 10</div>
+                    <div class="cert-seal">⭐</div>
+                    <div class="cert-footer">
+                        <div class="cert-sig"><div class="cert-sig-line"></div><div class="cert-sig-name">Director Académico</div></div>
+                        <div class="cert-sig"><div class="cert-sig-line"></div><div class="cert-sig-name">Benowu Academy</div></div>
+                    </div>
+                    <div class="cert-date">Expedido el ${date} · ID: ${certId}</div>
+                </div>
+            `;
+            $('certModal').classList.add('active');
+        }
+
+        function showAlert(title, msg, type = 'success') {
+            $('alertModalTitle').textContent = title;
+            $('alertModalMsg').textContent = msg;
+            const icon = $('alertModalIcon');
+            if (type === 'success') { icon.style.background = 'rgba(34, 197, 94, 0.15)'; icon.textContent = '✓'; }
+            else if (type === 'error') { icon.style.background = 'rgba(239, 68, 68, 0.15)'; icon.textContent = '✗'; }
+            else { icon.style.background = 'rgba(234, 179, 8, 0.15)'; icon.textContent = '⚠️'; }
+            $('alertModal').classList.add('active');
+        }
+
+        function showProfile() {
+            const av = $('profileAvatar');
+            av.innerHTML = S.user.avatar ? `<img src="${S.user.avatar}" alt="">` : S.user.name.charAt(0).toUpperCase();
+            $('profileName').textContent = S.user.name;
+            $('profileDNI').textContent = S.isAdmin ? 'Administrador' : `DNI: ${S.user.dni}`;
+            $('profileModal').classList.add('active');
+        }
+
+        function handleAvatar(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                S.user.avatar = ev.target.result;
+                saveSession();
+                updateHeader();
+                showProfile();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function goHome() {
+            if (S.isAdmin) { loadAdmin(); showScreen('admin'); }
+            else { loadExamGrid(); loadHistory(); checkPendingExams(); showScreen('dash'); }
+        }
+
+        function init() {
+            setTheme(localStorage.getItem('bnw_theme') || 'dark');
+            $('themeBtn').onclick = () => setTheme(S.theme === 'dark' ? 'light' : 'dark');
+            $('logoBtn').onclick = goHome;
+            $('loginForm').onsubmit = handleLogin;
+            $('logoutBtn').onclick = logout;
+            $('profileBtn').onclick = showProfile;
+            $('closeProfileBtn').onclick = () => $('profileModal').classList.remove('active');
+            $('avatarEdit').onclick = () => $('avatarInput').click();
+            $('avatarInput').onchange = handleAvatar;
+            $('nameInput').oninput = () => $('nameGroup').classList.remove('error');
+            $('dniInput').oninput = () => $('dniGroup').classList.remove('error');
+
+            document.querySelectorAll('.tab[data-tab]').forEach(t => {
+                t.onclick = () => {
+                    document.querySelectorAll('.tab[data-tab]').forEach(x => x.classList.remove('active'));
+                    t.classList.add('active');
+                    $('examsTab').classList.add('hidden');
+                    $('historyTab').classList.add('hidden');
+                    if (t.dataset.tab === 'exams') { $('examsTab').classList.remove('hidden'); loadExamGrid(); }
+                    else if (t.dataset.tab === 'history') { $('historyTab').classList.remove('hidden'); loadHistory(); }
+                };
+            });
+
+            document.querySelectorAll('.tab[data-admin-tab]').forEach(t => {
+                t.onclick = () => {
+                    document.querySelectorAll('.tab[data-admin-tab]').forEach(x => x.classList.remove('active'));
+                    t.classList.add('active');
+                    $('adminStatsTab').classList.add('hidden');
+                    $('adminResultsTab').classList.add('hidden');
+                    $('adminRankingTab').classList.add('hidden');
+                    $('adminExamsTab').classList.add('hidden');
+                    if (t.dataset.adminTab === 'stats') { $('adminStatsTab').classList.remove('hidden'); loadAdminStats(); }
+                    else if (t.dataset.adminTab === 'results') { $('adminResultsTab').classList.remove('hidden'); loadAdminResults(); }
+                    else if (t.dataset.adminTab === 'ranking') { $('adminRankingTab').classList.remove('hidden'); loadRanking(); }
+                    else if (t.dataset.adminTab === 'exams') { $('adminExamsTab').classList.remove('hidden'); loadExamManager(); }
+                };
+            });
+
+            $('prevBtn').onclick = () => { if (S.qIdx > 0) { S.qIdx--; renderQuestion(); } };
+            $('nextBtn').onclick = () => { if (S.qIdx < S.exam.q.length - 1) { S.qIdx++; renderQuestion(); } };
+            $('finishBtn').onclick = e => { e.preventDefault(); showConfirm(); };
+            $('markToggle').onclick = () => { S.marked[S.qIdx] = !S.marked[S.qIdx]; renderQuestion(); };
+
+            $('cancelBtn').onclick = hideConfirm;
+            $('confirmBtn').onclick = () => { hideConfirm(); finishExam(); };
+            $('confirmModal').onclick = e => { if (e.target === $('confirmModal')) hideConfirm(); };
+            $('profileModal').onclick = e => { if (e.target === $('profileModal')) $('profileModal').classList.remove('active'); };
+            $('certModal').onclick = e => { if (e.target === $('certModal')) $('certModal').classList.remove('active'); };
+            $('closeCertBtn').onclick = () => $('certModal').classList.remove('active');
+            $('printCertBtn').onclick = () => window.print();
+            $('closeAlertBtn').onclick = () => $('alertModal').classList.remove('active');
+            $('alertModal').onclick = e => { if (e.target === $('alertModal')) $('alertModal').classList.remove('active'); };
+
+            $('homeBtn').onclick = goHome;
+
+            $('newExamBtn').onclick = () => { S.editingExamId = null; editExam(null); };
+            $('examEditForm').onsubmit = saveExamEdit;
+            $('cancelExamBtn').onclick = () => $('examEditModal').classList.remove('active');
+            $('examEditModal').onclick = e => { if (e.target === $('examEditModal')) $('examEditModal').classList.remove('active'); };
+            $('pickEmojiBtn').onclick = () => {
+                const grid = $('emojiGrid');
+                grid.innerHTML = emojis.map(e => `<div class="emoji-item" data-emoji="${e}">${e}</div>`).join('');
+                grid.querySelectorAll('.emoji-item').forEach(item => {
+                    item.onclick = () => {
+                        $('editExamIcon').value = item.dataset.emoji;
+                        $('emojiModal').classList.remove('active');
+                    };
+                });
+                $('emojiModal').classList.add('active');
+            };
+            $('closeEmojiBtn').onclick = () => $('emojiModal').classList.remove('active');
+            $('emojiModal').onclick = e => { if (e.target === $('emojiModal')) $('emojiModal').classList.remove('active'); };
+
+            document.onkeydown = e => {
+                if (!screens.exam.classList.contains('hidden')) {
+                    if (e.key === 'ArrowLeft' && S.qIdx > 0) { S.qIdx--; renderQuestion(); }
+                    else if (e.key === 'ArrowRight' && S.qIdx < S.exam.q.length - 1) { S.qIdx++; renderQuestion(); }
+                    else if (e.key >= '1' && e.key <= '4') {
+                        const origIdx = S.shuffleMap[S.qIdx];
+                        S.answers[origIdx] = parseInt(e.key) - 1;
+                        renderQuestion();
+                    }
+                }
+            };
+
+            const session = loadSession();
+            if (session) {
+                S.user = session.u;
+                S.isAdmin = session.a;
+                updateHeader();
+                if (S.isAdmin) { loadAdmin(); showScreen('admin'); }
+                else { loadExamGrid(); loadHistory(); checkPendingExams(); showScreen('dash'); }
+            }
+        }
+
+        init();
+    })();
+    </script>
+</body>
+</html>
